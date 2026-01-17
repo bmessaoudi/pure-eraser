@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://pure-eraser.netlify.app/sitemap.xml
+Sitemap: https://pure-eraser.vercel.app/sitemap.xml
