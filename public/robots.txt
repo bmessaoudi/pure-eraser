@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://pure-eraser.netlify.app/sitemap.xml

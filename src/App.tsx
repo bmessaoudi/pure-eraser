@@ -5,6 +5,7 @@ import {
   Slider,
   Upload,
   message,
+  Modal,
   theme as antTheme,
 } from "antd";
 import {
@@ -16,6 +17,9 @@ import {
   Check,
   Crop as CropIcon,
   Scissors,
+  Info,
+  Github,
+  Heart,
 } from "lucide-react";
 import type { UploadProps } from "antd/es/upload/interface";
 import ReactCrop, {
@@ -66,6 +70,10 @@ const App: React.FC = () => {
   // --- State ---
   // NEW FLOW: upload -> erase -> crop -> export
   const [step, setStep] = useState<"upload" | "erase" | "crop">("upload");
+
+  // Modals
+  const [isTutorialOpen, setIsTutorialOpen] = useState(false);
+  const [isOpenSourceModalOpen, setIsOpenSourceModalOpen] = useState(false);
 
   // Image Data
   const [originalFileSrc, setOriginalFileSrc] = useState<string | null>(null);
@@ -292,20 +300,26 @@ const App: React.FC = () => {
 
   return (
     <ConfigProvider theme={customTheme}>
-      <div className="flex h-screen w-full bg-background overflow-hidden text-slate-100 font-sans">
+      <div className="flex flex-col-reverse md:flex-row h-dvh w-full bg-background overflow-hidden text-slate-100 font-sans">
         {/* SIDEBAR */}
-        <aside className="w-80 bg-surface border-r border-slate-700 flex flex-col p-6 z-10 shadow-xl">
-          {/* Brand */}
-          <div className="flex items-center gap-3 mb-8 animate-fade-in">
+        <aside className="w-full md:w-80 bg-surface border-t md:border-t-0 md:border-r border-slate-700 flex flex-col p-4 md:p-6 z-10 shadow-xl shrink-0 h-auto md:h-full max-h-[40vh] md:max-h-full overflow-hidden">
+          {/* Brand - Hidden on mobile to save space, or kept small */}
+          <div className="hidden md:flex items-center gap-3 mb-8 animate-fade-in">
             <div className="bg-gradient-to-br from-blue-500 to-purple-600 p-2 rounded-lg shadow-lg">
               <Zap size={24} className="text-white fill-current" />
             </div>
             <h1 className="text-2xl font-bold tracking-tight text-white">
               PureEraser
             </h1>
+            <div
+              className="ml-auto text-slate-400 hover:text-white cursor-pointer transition-colors"
+              onClick={() => setIsTutorialOpen(true)}
+            >
+              <Info size={20} />
+            </div>
           </div>
 
-          <div className="flex-1 flex flex-col gap-6 overflow-y-auto">
+          <div className="flex-1 flex flex-col gap-4 md:gap-6 overflow-y-auto custom-scrollbar">
             {/* Dynamic Sidebar Content Based on Step */}
             {step === "upload" && (
               <div className="text-slate-400 text-sm animate-fade-in">
@@ -438,16 +452,45 @@ const App: React.FC = () => {
             )}
           </div>
 
-          <div className="mt-auto pt-6 text-xs text-slate-600 text-center">
-            v1.1.0 • PureEraser
+          <div className="mt-auto pt-6 text-xs text-slate-500 text-center flex flex-col gap-2">
+            <div>v1.1.0 • PureEraser</div>
+            <div className="flex items-center justify-center gap-1">
+              Made with{" "}
+              <Heart size={12} className="text-red-500 fill-current" /> by{" "}
+              <a
+                href="https://www.instagram.com/bilel.it"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-slate-400 hover:text-blue-400 transition-colors"
+              >
+                @bilel.it
+              </a>
+            </div>
+            <div
+              className="flex items-center justify-center gap-1 cursor-pointer hover:text-white transition-colors"
+              onClick={() => setIsOpenSourceModalOpen(true)}
+            >
+              <Github size={12} />
+              <span>Open Source</span>
+            </div>
           </div>
         </aside>
 
         {/* MAIN AREA */}
-        <main className="flex-1 relative flex flex-col h-full bg-[#0B1120]">
+        <main className="flex-1 relative flex flex-col h-full bg-[#0B1120] overflow-hidden">
+          {/* Mobile Info Button */}
+          <div className="md:hidden absolute top-4 left-4 z-50">
+            <div
+              className="text-slate-200 cursor-pointer drop-shadow-md hover:text-white transition-colors"
+              onClick={() => setIsTutorialOpen(true)}
+            >
+              <Info size={24} />
+            </div>
+          </div>
+
           {step === "upload" && (
-            <div className="absolute inset-0 flex items-center justify-center p-10 animate-fade-in">
-              <div className="w-full max-w-xl h-96 border-4 border-dashed border-slate-700 rounded-3xl flex items-center justify-center hover:border-blue-500/50 hover:bg-slate-800/30 transition-all duration-500 group cursor-pointer overflow-hidden relative">
+            <div className="absolute inset-0 flex items-center justify-center p-4 md:p-10 animate-fade-in">
+              <div className="w-full max-w-xl h-64 md:h-96 border-4 border-dashed border-slate-700 rounded-3xl flex items-center justify-center hover:border-blue-500/50 hover:bg-slate-800/30 transition-all duration-500 group cursor-pointer overflow-hidden relative">
                 <Dragger
                   accept=".jpg,.jpeg,.png,.webp"
                   multiple={false}
@@ -472,17 +515,21 @@ const App: React.FC = () => {
           )}
 
           {step === "erase" && originalFileSrc && (
-            <div className="h-full flex flex-col p-6 animate-fade-in">
-              <div className="flex items-center gap-2 mb-4 text-slate-400">
+            <div className="h-full flex flex-col p-4 md:p-6 animate-fade-in overflow-y-auto md:overflow-hidden">
+              <div className="flex items-center gap-2 mb-4 text-slate-400 shrink-0">
                 <Zap size={16} />
                 <span className="text-sm font-medium uppercase tracking-widest">
                   Step 1: Remove Background
                 </span>
+                {/* Mobile Brand for context */}
+                <div className="md:hidden ml-auto font-bold text-white flex items-center gap-2">
+                  PureEraser
+                </div>
               </div>
-              <div className="flex-1 grid grid-cols-2 gap-6 h-full">
+              <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 min-h-0">
                 {/* Source Panel */}
-                <div className="flex flex-col bg-slate-900/50 rounded-2xl border border-slate-800 overflow-hidden shadow-xl hover:shadow-2xl transition-shadow duration-500 group">
-                  <div className="p-4 border-b border-slate-800 flex items-center gap-2 bg-slate-900/80 backdrop-blur">
+                <div className="flex flex-col bg-slate-900/50 rounded-2xl border border-slate-800 overflow-hidden shadow-xl hover:shadow-2xl transition-shadow duration-500 group h-64 md:h-auto">
+                  <div className="p-3 md:p-4 border-b border-slate-800 flex items-center gap-2 bg-slate-900/80 backdrop-blur">
                     <ImageIcon size={16} className="text-blue-400" />
                     <span className="text-sm font-semibold text-slate-300">
                       Original
@@ -497,7 +544,7 @@ const App: React.FC = () => {
                       onClick={handleImageClick}
                     />
                     {isPickMode && (
-                      <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-black/80 px-3 py-1 rounded-full text-xs text-white font-medium">
+                      <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-black/80 px-3 py-1 rounded-full text-xs text-white font-medium z-20 pointer-events-none whitespace-nowrap">
                         Click to pick color
                       </div>
                     )}
@@ -505,7 +552,7 @@ const App: React.FC = () => {
                 </div>
 
                 {/* Preview Panel */}
-                <div className="flex flex-col bg-slate-900/50 rounded-2xl border border-slate-800 overflow-hidden shadow-xl hover:shadow-2xl transition-shadow duration-500">
+                <div className="flex flex-col bg-slate-900/50 rounded-2xl border border-slate-800 overflow-hidden shadow-xl hover:shadow-2xl transition-shadow duration-500 h-64 md:h-auto">
                   <div className="p-4 border-b border-slate-800 flex items-center gap-2 bg-slate-900/80 backdrop-blur">
                     <Zap size={16} className="text-purple-400" />
                     <span className="text-sm font-semibold text-slate-300">
@@ -532,7 +579,7 @@ const App: React.FC = () => {
           )}
 
           {step === "crop" && processedImageUrl && (
-            <div className="h-full flex flex-col p-8 animate-fade-in relative">
+            <div className="h-full flex flex-col p-4 md:p-8 animate-fade-in relative overflow-hidden">
               <div className="flex items-center gap-2 mb-4 text-slate-400">
                 <CropIcon size={16} />
                 <span className="text-sm font-medium uppercase tracking-widest">
@@ -559,6 +606,90 @@ const App: React.FC = () => {
           )}
         </main>
       </div>
+
+      {/* Tutorial Modal */}
+      <Modal
+        title="How to use PureEraser"
+        open={isTutorialOpen}
+        onCancel={() => setIsTutorialOpen(false)}
+        footer={null}
+        centered
+        className="custom-modal"
+      >
+        <div className="space-y-4 pt-4 text-white">
+          <ol className="list-decimal pl-5 space-y-2">
+            <li>
+              <strong>Upload Image:</strong> Drag & drop or click to upload your
+              image.
+            </li>
+            <li>
+              <strong>Remove Background:</strong> The app will auto-detect the
+              background color. Use the "Pick Color" tool if needed. Adjust
+              "Tolerance" to fine-tune.
+            </li>
+            <li>
+              <strong>Crop:</strong> Click "Continue to Crop" to refine the
+              image boundaries.
+            </li>
+            <li>
+              <strong>Export:</strong> Download your transparent PNG!
+            </li>
+          </ol>
+        </div>
+      </Modal>
+
+      {/* Open Source Modal */}
+      <Modal
+        title="Open Source"
+        open={isOpenSourceModalOpen}
+        onCancel={() => setIsOpenSourceModalOpen(false)}
+        footer={null}
+        centered
+        className="custom-modal"
+      >
+        <div className="space-y-4 pt-4 text-slate-800 dark:text-slate-200 flex flex-col items-center text-center">
+          <Github
+            size={48}
+            className="text-slate-700 dark:text-slate-300 mb-2"
+          />
+          <h3 className="text-lg font-bold">PureEraser is Open Source!</h3>
+          <p className="text-slate-500">
+            Check out the code, contribute, or leave a star on our repository.
+          </p>
+          <Button
+            type="primary"
+            href="https://github.com/bmessaoudi/pure-eraser"
+            target="_blank"
+            icon={<Github size={16} />}
+            className="w-full"
+          >
+            Visit Repository
+          </Button>
+
+          <div className="w-full border-t border-slate-200 dark:border-slate-700 pt-4 mt-2">
+            <h4 className="text-sm font-semibold mb-2 text-slate-500">
+              Tech Stack
+            </h4>
+            <div className="flex flex-wrap justify-center gap-2">
+              <span className="px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-100 rounded text-xs">
+                React
+              </span>
+              <span className="px-2 py-1 bg-cyan-100 dark:bg-cyan-900 text-cyan-800 dark:text-cyan-100 rounded text-xs">
+                TypeScript
+              </span>
+              <span className="px-2 py-1 bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-100 rounded text-xs">
+                Vite
+              </span>
+              <span className="px-2 py-1 bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-100 rounded text-xs">
+                Ant Design
+              </span>
+              <span className="px-2 py-1 bg-teal-100 dark:bg-teal-900 text-teal-800 dark:text-teal-100 rounded text-xs">
+                TailwindCSS
+              </span>
+            </div>
+          </div>
+        </div>
+      </Modal>
     </ConfigProvider>
   );
 };
